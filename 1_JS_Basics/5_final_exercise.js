@@ -16,6 +16,16 @@
 // any input number. For instance, if input is 10, the result is 55.
 // Motivational Hint: This exercise is often asked at job interviews.
 
+function fibonacci(n) {
+    let fibo = [ 0, 1 ];
+    if (n < 2) return fibo[n]; 
+    for(let i=2; i<=n; i++) {
+        fibo[i] = fibo[i-1] + fibo[i-2];
+    }
+    console.log(fibo[n]);
+}
+
+fibonacci(10);
 
 // EXERCISE 2. Bonus. Recursive Fibonacci.
 //////////////////////////////////////////
@@ -47,7 +57,17 @@ console.log(resultOfRecursion);
 // Now write the fibonacci recursive function.
 // Hint: it takes just 2 lines (but you could make it one).
 
+function fiboRec(n) {
+    if (n < 2) return n;
+    return fiboRec(n-1) + fiboRec(n-2);
+}
+fiboRec(10);
 
+// One-liner.
+function fiboRec1(n) {
+    return n < 2 ?  n : fiboRec1(n-1) + fiboRec1(n-2);
+}
+fiboRec1(10);
 
 // FUN EXERCISE!
 ////////////////

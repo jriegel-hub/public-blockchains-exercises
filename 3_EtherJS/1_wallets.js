@@ -60,7 +60,7 @@ function exit() {
     process.exit();
 }
 
-exit();
+// exit();
 
 // c. Bonus. Did you realize that JavaScript/Node.JS has three different ways
 // of declaring a function?
@@ -120,7 +120,7 @@ exercise = 2;
 // See if it worked.
 console.log(process.env);
 
-exit();
+// exit();
 
 // Exercise 3. Check the content of the .env file.
 //////////////////////////////////////////////////
@@ -133,10 +133,13 @@ exercise = '3a';
 // a. Check that the variable METAMASK_ACCOUNT_1 is not empty. Write an 
 // if statement that print a warning message if empty.
 // Hint: https://javascript.info/ifelse
-console.log(process.env.METAMASK_ACCOUNT_1);
 
-let privateKey = process.env.METAMASK_PRIVATE_KEY;
+require("dotenv").config();
+console.log(process.env.METAMASK_1_ADDRESS);
+
+let privateKey = process.env.METAMASK_1_PRIVATE_KEY;
 if (privateKey === "") {
+    require("dotenv").config();
     console.log('Missing private key, fix your .env file');
 }
 
@@ -167,12 +170,21 @@ console.log('Num of variables in .env to check: ', variablesToCheck.length);
 
 // Solution 1. forEach.
 variablesToCheck.forEach(v => {
-    // Your code here!
+    if (!process.env[v]) {
+        console.log(process.env[v])
+        console.log(`Missing ${v}, fix your .env file`);
+    }
 });
 
 // Solution 2. For-loop.
 
-// Your code here!
+for (let index = 0; index < variablesToCheck.length; index++) {
+    const v = variablesToCheck[index];
+    if (!process.env[v]) {
+        console.log(process.env[v])
+        console.log(`Missing ${v}, fix your .env file`);
+    }
+}
 
 
 // exit();
@@ -188,9 +200,13 @@ const ethers = require("ethers");
 // and the mnenomic phrase.
 // Hint: ethers.Wallet.createRandom();
 
-constant.wallet = ethersWallet.createRandom();
+const wallet = ethers.Wallet.createRandom();
 
-console.log()
+console.log();
+console.log("Address:", wallet.address);
+console.log("Private key:", wallet.privateKey);
+console.log("Mnemonic:", wallet.mnemonic.phrase);
+console.log();
 
 // exit();
 
@@ -226,6 +242,14 @@ exercise = 5;
 // finally print the first 10 addresses and private keys generated.
 // Hint: You need to append an index to the derivation path.
 
-// Your code here!
+let mnemonic = wallet.mnemonic.phrase;
+
+let path, myWallet;
+for (let i = 0; i < 10; i++) {
+  path = `${baseDevPath}${i}`;
+  myWallet = ethers.HDNodeWallet.fromPhrase(mnemonic, path);
+  console.log("Address", i, myWallet.address);
+  console.log("Private key", i, myWallet.privateKey);
+}
 
 // exit();

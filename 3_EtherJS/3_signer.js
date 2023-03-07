@@ -16,14 +16,19 @@
 // Exercise 0. Load dependencies and network provider.
 //////////////////////////////////////////////////////
 
+
 // a. Require the `dotenv` and `ethers` packages.
 // Hint: As you did in file 1_wallet and 2_provider.
 
-// Your code here!
+require('dotenv').config();
+const ethers = require("ethers");
 
 // b. Create a Goerli provider.
 
-// Your code here!
+const providerKey = process.env.INFURA_KEY;
+
+const goerliInfuraUrl = `${process.env.INFURA_GOERLI_API_URL}${providerKey}`;
+const goerliProvider = new ethers.JsonRpcProvider(goerliInfuraUrl);
 
 // Exercise 1. Create a Signer.
 ///////////////////////////////
@@ -39,17 +44,39 @@
 // Hint: a signer is a wallet.
 // Hint2: if you get an error here, check that the private key begins with "0x".
 
-// Your code here!
+let signer = new ethers.Wallet(process.env.METAMASK_1_PRIVATE_KEY);
+console.log(signer.address);
 
 // Exercise 2. Sign something.
 //////////////////////////////
 
 const sign = async (message = 'Hello world') => {
     
-    // Your code here!
+    // Signing the message
+    const signature = await signer.signMessage(message);
+
+    const verifiedSigner = ethers.verifyMessage(message, signature);
+    
+    if (verifiedSigner === signer.address) {
+        console.log('Signature is valid.');
+    }
+    else {
+        console.log('Signature is NOT valid.');
+    }
+
+    let anotherMessage = 'Give me 5 ETH';
+
+    const verifiedSigner2 = ethers.verifyMessage(anotherMessage, signature);
+    
+    if (verifiedSigner2 === signer.address) {
+        console.log('Tampered signature is valid.');
+    }
+    else {
+        console.log('Tampered signature is NOT valid.');
+    }
 };
 
-// sign();
+sign();
 
 // Exercise 3. Connect to the blockchain. 
 /////////////////////////////////////////

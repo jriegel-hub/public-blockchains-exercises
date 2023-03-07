@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "ethers": "^6.0.8",
+    "hydrogen": "^0.2.0"
   }
 }
