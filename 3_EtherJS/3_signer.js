@@ -88,11 +88,16 @@ sign();
 // Hint: .getNonce()
 
 const connect = async() => {
-    
-    // Your code here!
+    signer = await signer.connect(goerliProvider);
+    console.log(signer);
+
+    let nonce = await signer.getNonce();
+    // Equivalent to.
+    // let nonce = await goerliProvider.getTransactionCount("unima.eth");
+    console.log('The nonce is', nonce);
 };
 
-// connect();
+connect();
 
 // c. Replace the signer created above at exercise 1 with one that takes the 
 // Goerli provider as second parameter. This is necessary even
@@ -101,8 +106,9 @@ const connect = async() => {
 // and the remaning of the exercises. If unclear, just check the solution :)
 
 // Replace the signer created above.
+signer = new ethers.Wallet(process.env.METAMASK_1_PRIVATE_KEY, goerliProvider);
 
-
+console.log(signer);
 
 // Exercise 4. Send a transaction.
 //////////////////////////////////
@@ -125,10 +131,33 @@ const account2 = process.env.METAMASK_2_ADDRESS;
 
 const sendTransaction = async () => {
 
-    // Your code here!
+    let b1 = await goerliProvider.getBalance(signer.address);
+    let b2 = await goerliProvider.getBalance(account2);
+    b1 = ethers.formatEther(b1);
+    b2 = ethers.formatEther(b2);
+
+    tx = await signer.sendTransaction({
+        to: account2,
+        value: ethers.parseEther("0.01")
+    });
+
+    console.log(tx);
+    
+    console.log('Transaction is in the mempool...');
+    await tx.wait();
+
+    console.log('Transaction mined!');
+
+    let updatedB1 = await goerliProvider.getBalance(signer.address);
+    let updatedB2 = await goerliProvider.getBalance(account2);
+    updatedB1 = ethers.formatEther(updatedB1);
+    updatedB2 = ethers.formatEther(updatedB2);
+
+    console.log('Balance for', signer.address, 'changed from', b1, 'to', updatedB1);
+    console.log('Balance for', account2, 'changed from', b2, 'to', updatedB2);
 };
 
-// sendTransaction();
+sendTransaction();
 
 
 // Exercise 5. Meddling with Gas.
@@ -194,7 +223,34 @@ const sendTransaction = async () => {
 // a, b, c. 
 const checkGasPrices = async () => {
 
-    // Your code here!
+    setInterval(async () => {
+        let tx = await signer.populateTransaction({
+            to: account2,
+            value: ethers.parseEther("0.01"),
+        });
+    
+        console.log(tx);
+    
+        console.log('Gas Limit', tx.gasLimit);
+        console.log('Max Fee per Gas (GWEI)', ethers.formatUnits(tx.maxFeePerGas, 'gwei'));
+        console.log('Max Priority Fee (GWEI)', ethers.formatUnits(tx.maxPriorityFeePerGas, 'gwei'));
+
+        console.log('---');
+        const feeData = await goerliProvider.getFeeData();
+        console.log(feeData)
+    
+        console.log('Legacy Gas Price (GWEI)', ethers.formatUnits(feeData.gasPrice, 'gwei'));
+        console.log('Max Fee per Gas (GWEI)', ethers.formatUnits(feeData.maxFeePerGas, 'gwei'));
+        console.log('Max Priority Fee (GWEI)', ethers.formatUnits(feeData.maxPriorityFeePerGas, 'gwei'));
+        
+        console.log('');
+        const lastBlock = await goerliProvider.getBlock("latest");
+        console.log('Base Fee Previous Block (GWEI)', ethers.formatUnits(lastBlock.baseFeePerGas, 'gwei'));
+
+        // maxFeePerGas = (2 * baseFeePerGas) + maxPriorityFeePerGas
+        console.log('');
+
+    }, 1000);
 
 };
 
@@ -216,9 +272,27 @@ const checkGasPrices = async () => {
 // d. e.
 const sendCheaperTransaction = async () => {
 
-    // Your code here!
+
+    const feeData = await goerliProvider.getFeeData();
+    // console.log(feeData)
+
+    console.log('Legacy Gas Price (GWEI)', ethers.formatUnits(feeData.gasPrice, 'gwei'));
+    console.log('Max Fee per Gas (GWEI)', ethers.formatUnits(feeData.maxFeePerGas, 'gwei'));
+    console.log('Max Priority Fee (GWEI)', ethers.formatUnits(feeData.maxPriorityFeePerGas, 'gwei'));
+
+    tx = await signer.sendTransaction({
+        to: account2,
+        value: ethers.parseEther("0.01"),
+        maxFeePerGas: feeData.maxFeePerGas - 5000000000n
+    });
+
+    console.log('Transaction is in the mempool...');
+    let receipt = await tx.wait();
+    console.log(receipt);
+    console.log('Transaction mined!');
 
 };
+
 
 // sendCheaperTransaction();
 
@@ -257,8 +331,26 @@ const sendCheaperTransaction = async () => {
 
 const resubmitTransaction = async () => {
 
+    let nextNonce = await signer.getNonce();
+    // Equivalent to:
+    // let nonce = await goerliProvider.getTransactionCount(signer.address);
+    console.log('Next Nonce is:', nextNonce);
 
-    // Your Code here!
+    const feeData = await goerliProvider.getFeeData();
+    
+    tx = await signer.sendTransaction({
+        to: account2,
+        value: ethers.parseEther("0.1"),
+        maxFeePerGas: 2n*feeData.maxFeePerGas,
+        maxPriorityFeePerGas: 2n*feeData.maxPriorityFeePerGas,
+        nonce: nextNonce
+    });
+    console.log(tx);
+    
+    console.log('Transaction is in the mempool...');
+    let receipt = await tx.wait();
+    console.log(receipt);
+    console.log('Transaction mined!');
 
 };
 
