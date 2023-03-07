@@ -39,8 +39,8 @@
 // be executed, until you tell the process to stop. 
 
 // This line will tell the process to stop.
-process.exit(0);
-console.log('I am sad line...I will not be printed to console :(');
+// process.exit(0);
+// console.log('I am sad line...I will not be printed to console :(');
 
 // a. Move the sad line above and below `process.exit(0);` to check that the
 // process stops where it is intended to. When you are done, comment out both
@@ -54,6 +54,13 @@ console.log('I am sad line...I will not be printed to console :(');
 let exercise = 0;
 
 // Your code here!
+
+function exit() {
+    console.log("Process stops here, Exercise " + exercise);
+    process.exit();
+}
+
+exit();
 
 // c. Bonus. Did you realize that JavaScript/Node.JS has three different ways
 // of declaring a function?
@@ -109,11 +116,11 @@ exercise = 2;
 
 // Create a .env file with the necessary information.
 // Hint: you can copy .env_sample, modify its content and save it as .env.
- 
+
 // See if it worked.
 console.log(process.env);
 
-// exit();
+exit();
 
 // Exercise 3. Check the content of the .env file.
 //////////////////////////////////////////////////
@@ -126,10 +133,12 @@ exercise = '3a';
 // a. Check that the variable METAMASK_ACCOUNT_1 is not empty. Write an 
 // if statement that print a warning message if empty.
 // Hint: https://javascript.info/ifelse
+console.log(process.env.METAMASK_ACCOUNT_1);
 
-// Your code here!
-
-// exit();
+let privateKey = process.env.METAMASK_PRIVATE_KEY;
+if (privateKey === "") {
+    console.log('Missing private key, fix your .env file');
+}
 
 // b. Create an array with all the names of the variables written in the .env
 // file. Then print the lenght of the array.
@@ -138,6 +147,13 @@ exercise = '3a';
 exercise = '3b';
 
 // Your code here!
+
+let variablesToCheck = ["INFURA_KEY", "INFURA_GOERLI_API_URL", 
+"INFURA_MAINNET_API_URL", "ALCHEMY_KEY", "ALCHEMY_GOERLI_API_URL", 
+"ALCHEMY_MAINNET_API_URL", "METAMASK_1_ADDRESS", "METAMASK_1_PRIVATE_KEY", 
+"METAMASK_2_ADDRESS", "METAMASK_2_PRIVATE_KEY", "ETHERSCAN_KEY"];
+
+console.log('Num of variables in .env to check: ', variablesToCheck.length);
 
 // exit();
 
@@ -172,6 +188,9 @@ const ethers = require("ethers");
 // and the mnenomic phrase.
 // Hint: ethers.Wallet.createRandom();
 
+constant.wallet = ethersWallet.createRandom();
+
+console.log()
 
 // exit();
 
