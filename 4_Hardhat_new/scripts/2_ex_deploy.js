@@ -37,7 +37,8 @@ return;
 
 // a. Require ethers and print the version of Ethers, just to be sure.
 
-// Your code here!
+const ethers = require("ethers");
+console.log("Ethers version:", ethers.version);
 
 return;
 
@@ -46,7 +47,7 @@ return;
 // hre.ethers (require statement above).
 // Print the version of this plugin, it should be the same as above.
 
-// Your code here!
+console.log("HH Wrapped Ethers version:", hre.ethers.version);
 
 return;
 
@@ -82,7 +83,7 @@ return;
 // a. Update with your contract's name and address.
 // Hint: The address is known only after deployment.
 const contractName = "Lock2";
-const contractAddress = "FILL_THIS_VALUE";
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 // Let's continue inside the async main function (the recommended Hardhat
 // pattern of execution).
@@ -94,18 +95,23 @@ async function main() {
   // execute: npx hardhat node
   // Hint: hre.ethers.getSigners() returns an array.
 
-  // Your code here!
+  const hardhatSigners = await hre.ethers.getSigners();
+  const hhSigner = hardhatSigners[0];
 
-  return;
+  console.log("HH Signer address:", hhSigner.address);
+
+  //return;
 
   // c. Get your new contract. Hardhat Ethers automatically fetches the ABI from
   // the artifacts, so you don't need to specify it. Use the method
   // hre.ethers.getContractAt(<name>, <address>, <signer>)
   // then print the contract address.
 
-  // Your code here!
-
-  return;
+  const lock = await hre.ethers.getContractAt(contractName,
+    contractAddress,
+    hhSigner);  
+    
+  console.log(contractName + " address", lock.address);
 
   // d. Bonus. You can get the contract also without Hardhat's wrapped Ethers.
   // The standard (here V5) Ethers.JS requires a bit more code, but is is 
@@ -117,13 +123,14 @@ async function main() {
     // d.1 Fetch the ABI from the artifacts 
     // (it expects contract name = file name).
 
-    // Your code here!
+    const lock2ABI = require("../artifacts/contracts/" + contractName + 
+                            ".sol/" + contractName + ".json").abi;
 
     // d.2 Create the contract and print the address.
 
-    // Your code here!
+    const lock = new ethers.Contract(address, lock2ABI, signer);
 
-    // const lock = ... ;
+    console.log(contractName + " address standard Ethers", lock.address);
 
     return lock;
 
@@ -138,7 +145,8 @@ async function main() {
       
     // Print the owner of the lock.
    
-    // Your code here!
+    const owner = await lock.owner();
+    console.log("Owner of " + contractName, owner);
 
     // Print the unlock time. 
     // Be careful! You will get a BigInt, you need first
@@ -147,7 +155,11 @@ async function main() {
     // https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
     // https://stackoverflow.com/questions/53970655/how-to-convert-bigint-to-number-in-javascript
 
-    // Your code here!
+    let unlockTime = await lock.unlockTime();
+    unlockTime = Number(unlockTime);
+    console.log(contractName + " unlock timestamp:", unlockTime);
+    let date = new Date((unlockTime * 1000));
+    console.log(contractName + " unlock date:", date);
   };
 
   // await readContract();
